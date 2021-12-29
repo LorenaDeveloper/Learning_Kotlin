@@ -20,15 +20,41 @@ fun main(args: Array<String>) {
     val product2 = Product(name = "Orange")
     println("Product name: ${product2.name} , default price: ${product2.price}")
 
-    //check that two instances with the same data are not the same object because they have different ObjectId
+    // check that two instances with the same data are not the same object because they have different ObjectId
+    // only if data is not added to class; if added -> true
     val product3 = Product(name = "Orange")
     println("product2 == product3 -> ${product2 == product3}")
+
+    //once overwritten the equal to the function... it can be compared only by the name
+    product3.price = 10.0
+    println("product2 == product3 -> ${product2 == product3}")
+
+
 }
 
 // val -> invariable
 // var -> variable
-// si no tiene funciones, no es necesario usar {}
-// si no tiene atributos, se puede eliminar (val name:String)
-// Double? indica con la '?' que puede ser nulo
-// para declarar valores por defecto " = valor " en el parámetro del atributo
-class Product(val name:String, var price:Double? = 1.5)
+// if it has no functions, it is not necessary to use {}
+// if it has no attributes, (val name:String) can be deleted
+// Double? indicates with the '?' that it can be null
+// to declare default values " = valor " in the attribute parameter
+// data -> it'll overwrites toString, equals and hashCode using attributes in main constructor
+data class Product(val name:String, var price:Double? = 1.5){
+    override fun equals(other: Any?): Boolean {
+        //first verify object not null
+        other ?: return false //returns false if null
+        if (other === this) return true
+        if (this.javaClass != other.javaClass) return false
+
+        // now we're sure we've got 2 objects of the same class
+        // cast other to Product type
+        other as Product
+
+        // return true/false just by name comparison
+        return this.name === other.name
+    }
+
+    override fun hashCode(): Int {
+        return name.hashCode()
+    }
+}
