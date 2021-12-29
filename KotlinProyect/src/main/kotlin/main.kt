@@ -1,24 +1,28 @@
 fun main(args: Array<String>) {
     println("Hello World!")
 
-    //creo una instancia de la clase
+    //create an instance of class
     val product = Product("Apple", 1.5);
-    println("Producto: $product") //imprime el objectId
-    println("Nombre del producto: ${product.name}, precio:  ${product.price}") //imprime las propiedades
+    println("Product: $product") //imprime el objectId
+    println("Product name: ${product.name}, price:  ${product.price}") //print properties
 
-    //para agregar las propiedades en distinto orden
+    //to add the properties in different order
     val product1 = Product(price = 2.0, name = "Orange")
-    println("Producto: $product1") //imprime el objectId
-    println("Nombre del producto: ${product1.name} , precio: ${product1.price}")
+    println("Product: $product1") //imprime el objectId
+    println("Product name: ${product1.name} , price: ${product1.price}")
     product1.price = 2.1
-    println("Precio actualizado: ${product1.name} , precio: ${product1.price}")
+    println("Precio actualizado: ${product1.name} , price: ${product1.price}")
 
-    //product1.name = null  <-  no admite nulos
+    //product1.name = null  <-  null not allowed
     product1.price=null
-    println("Precio actualizado a null: ${product1.name} , precio: ${product1.price}")
+    println("Price updated to null: ${product1.name} , price: ${product1.price}")
 
     val product2 = Product(name = "Orange")
-    println("Nombre del producto: ${product2.name} , precio por defecto: ${product2.price}")
+    println("Product name: ${product2.name} , default price: ${product2.price}")
+
+    //check that two instances with the same data are not the same object because they have different ObjectId
+    val product3 = Product(name = "Orange")
+    println("product2 == product3 -> ${product2 == product3}")
 }
 
 // val -> invariable
