@@ -13,8 +13,8 @@ Date: December 2021
 Learning project of the [kotlin course](https://www.udemy.com/course/kotlin-backend-sin-sufrimiento/) I'm doing with Udemy
 
 # Technologies 	:woman_technologist:
-* Ktolin
-* Spring Boot
+* Ktolin <img src="https://github.com/LorenaDeveloper/Learning_Kotlin/blob/main/Images/kotlin.png" width='60px'>
+* Spring Boot <img src="https://github.com/LorenaDeveloper/Learning_Kotlin/blob/main/Images/spring-boot.png" width='60px'>
 
 # Setup :mega:
 
