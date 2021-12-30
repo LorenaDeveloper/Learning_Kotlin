@@ -1,5 +1,7 @@
 # Learning Kotlin :green_book:
 
+I'm using this project to reinforce the knowledge I am acquiring in the course ["Kotlin: Backend without suffering"](https://www.udemy.com/course/kotlin-backend-sin-sufrimiento/) that I am taking with Udemy.
+
 # Table of contents :nerd_face:
 * [Learning Kotlin](#learning-kotlin-green_book)
 * [Table of contents](#table-of-contents-nerd_face)
