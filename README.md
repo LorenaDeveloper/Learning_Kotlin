@@ -14,6 +14,7 @@ Learning project of the [kotlin course](https://www.udemy.com/course/kotlin-back
 
 # Technologies 	:woman_technologist:
 * Ktolin
+* Spring Boot
 
 # Setup :mega:
 
