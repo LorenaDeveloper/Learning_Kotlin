@@ -31,7 +31,7 @@ class ProductService:BasicCrud<Product, String> {       // implements interface 
 
     override fun update(t: Product): Boolean {
         //there isn't update sentence, so remove and add
-        return this.products.remove(t) && this.products.add(t)
+        return this.deleteById(t.name) && this.products.add(t)
     }
 
     override fun deleteById(id: String): Boolean {
