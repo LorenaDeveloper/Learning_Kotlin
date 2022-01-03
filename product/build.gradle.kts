@@ -22,6 +22,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	compile("net.minidev:json-smart:2.4.7")
 }
 
 tasks.withType<KotlinCompile> {
