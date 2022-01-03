@@ -98,6 +98,31 @@ class ProductApplicationTests {
 			.andExpect(MockMvcResultMatchers.status().isOk)
 			.bodyTo(objectMapper)
 
-		assertThat(!result)
+		assert(!result)
+	}
+
+	@Test
+	fun updateTest(){
+		var productsFromService:List<Product> = productService.findAll()
+		assert(!productsFromService.isEmpty()){ "It shouldn't be empty" }
+		val product = productsFromService.first().copy(price = 21.45) //copy object's state but allows changing attributes
+
+		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.put(endPoint)
+			.body(data = product, mapper = objectMapper))
+			.andExpect(MockMvcResultMatchers.status().isOk)
+			.bodyTo(objectMapper)
+
+		assert(result)
+	}
+
+	@Test
+	fun updateTestWhenProductNotExists(){
+		var product = Product(name = UUID.randomUUID().toString(),12.0)
+		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.put(endPoint)
+			.body(data = product, mapper = objectMapper))
+			.andExpect(MockMvcResultMatchers.status().isOk)
+			.bodyTo(objectMapper)
+
+		assert(!result){"It should be false"}
 	}
 }
