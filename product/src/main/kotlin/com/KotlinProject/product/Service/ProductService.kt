@@ -18,6 +18,8 @@ class ProductService:BasicCrud<Product, String> {       // implements interface 
     }
 
     override fun save(t: Product): Boolean {
+        val found = findAll().filter { product -> product.name == t.name }
+        if (found.isNotEmpty()) return false
         return this.products.add(t)
     }
 
