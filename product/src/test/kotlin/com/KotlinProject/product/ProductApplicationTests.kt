@@ -125,4 +125,27 @@ class ProductApplicationTests {
 
 		assert(!result){"It should be false"}
 	}
+
+	@Test
+	fun deleteById(){
+		var productsFromService:List<Product> = productService.findAll()
+		assert(!productsFromService.isEmpty()){ "It shouldn't be empty" }
+		val product = productsFromService.last()
+
+		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.delete("$endPoint/${product.name}"))
+			.andExpect(MockMvcResultMatchers.status().isOk)
+			.bodyTo(objectMapper)
+
+		assert(result)
+		assertThat(!productService.findAll().contains(product))
+	}
+
+	@Test
+	fun deleteByIdWhenPorductNotFound(){
+		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.delete("$endPoint/${UUID.randomUUID()}"))
+			.andExpect(MockMvcResultMatchers.status().isOk)
+			.bodyTo(objectMapper)
+
+		assert(!result){"Should be false"}
+	}
 }
