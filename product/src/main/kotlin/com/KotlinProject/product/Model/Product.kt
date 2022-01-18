@@ -1,6 +1,13 @@
 package com.KotlinProject.product.Model
 
-data class Product(val name:String, var price:Double? = 1.5){
+import javax.validation.constraints.Min
+import javax.validation.constraints.Size
+
+data class Product(
+    @get:Size(min = 3, max = 20)
+    val name:String,
+    @get:Min(0)
+    var price:Double? = 1.5){
     override fun equals(other: Any?): Boolean {
         //first verify object not null
         other ?: return false //returns false if null
