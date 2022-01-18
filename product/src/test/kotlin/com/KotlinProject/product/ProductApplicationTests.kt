@@ -70,7 +70,7 @@ class ProductApplicationTests {
 
 		//${UUID.randomUUID()} generate random id
 		mockMvc.perform(MockMvcRequestBuilders.get("$endPoint/${UUID.randomUUID()}"))
-			.andExpect(MockMvcResultMatchers.status().isOk)
+			.andExpect(MockMvcResultMatchers.status().isNotFound)
 			.andExpect(jsonPath("$").doesNotExist())
 	}
 
@@ -80,10 +80,38 @@ class ProductApplicationTests {
 		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
 			.content(objectMapper.writeValueAsBytes(product))
 			.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(MockMvcResultMatchers.status().isOk)
+			.andExpect(MockMvcResultMatchers.status().isCreated)
 			.bodyTo(objectMapper)
 
 		assert(result)
+	}
+
+	@Test
+	fun saveTestWhenCheckRulesName(){
+		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
+			.body(data = Product("", 1.0), mapper = objectMapper)
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(MockMvcResultMatchers.status().isBadRequest)
+			.andExpect(jsonPath("$.name").exists())
+	}
+
+	@Test
+	fun saveTestWhenCheckRulesPrice(){
+		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
+			.body(data = Product("pear", -1.0), mapper = objectMapper)
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(MockMvcResultMatchers.status().isBadRequest)
+			.andExpect(jsonPath("$.price").exists())
+	}
+
+	@Test
+	fun saveTestWhenCheckRules(){
+		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
+			.body(data = Product("", -1.0), mapper = objectMapper)
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(MockMvcResultMatchers.status().isBadRequest)
+			.andExpect(jsonPath("$.name").exists())
+			.andExpect(jsonPath("$.price").exists())
 	}
 
 	@Test
@@ -95,7 +123,7 @@ class ProductApplicationTests {
 		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
 				//another way to perform it
 			.body(data = product, mapper = objectMapper))
-			.andExpect(MockMvcResultMatchers.status().isOk)
+			.andExpect(MockMvcResultMatchers.status().isConflict)
 			.bodyTo(objectMapper)
 
 		assert(!result)
@@ -117,10 +145,10 @@ class ProductApplicationTests {
 
 	@Test
 	fun updateTestWhenProductNotExists(){
-		var product = Product(name = UUID.randomUUID().toString(),12.0)
+		var product = Product(name = "something wrong",12.0)
 		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.put(endPoint)
 			.body(data = product, mapper = objectMapper))
-			.andExpect(MockMvcResultMatchers.status().isOk)
+			.andExpect(MockMvcResultMatchers.status().isNotFound)
 			.bodyTo(objectMapper)
 
 		assert(!result){"It should be false"}
@@ -143,7 +171,7 @@ class ProductApplicationTests {
 	@Test
 	fun deleteByIdWhenPorductNotFound(){
 		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.delete("$endPoint/${UUID.randomUUID()}"))
-			.andExpect(MockMvcResultMatchers.status().isOk)
+			.andExpect(MockMvcResultMatchers.status().isNotFound)
 			.bodyTo(objectMapper)
 
 		assert(!result){"Should be false"}

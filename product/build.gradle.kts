@@ -23,6 +23,13 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	compile("net.minidev:json-smart:2.4.7")
+	// https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
+	implementation("io.springfox:springfox-swagger2:3.0.0")
+	implementation("io.springfox:springfox-swagger-ui:3.0.0")
+
+	implementation("javax.validation:validation-api:2.0.1.Final")
+	implementation("org.springframework.boot:spring-boot-starter-validation:2.6.2")
+
 }
 
 tasks.withType<KotlinCompile> {
