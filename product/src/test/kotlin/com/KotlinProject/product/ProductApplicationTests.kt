@@ -87,6 +87,34 @@ class ProductApplicationTests {
 	}
 
 	@Test
+	fun saveTestWhenCheckRulesName(){
+		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
+			.body(data = Product("", 1.0), mapper = objectMapper)
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(MockMvcResultMatchers.status().isBadRequest)
+			.andExpect(jsonPath("$.name").exists())
+	}
+
+	@Test
+	fun saveTestWhenCheckRulesPrice(){
+		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
+			.body(data = Product("pear", -1.0), mapper = objectMapper)
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(MockMvcResultMatchers.status().isBadRequest)
+			.andExpect(jsonPath("$.price").exists())
+	}
+
+	@Test
+	fun saveTestWhenCheckRules(){
+		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
+			.body(data = Product("", -1.0), mapper = objectMapper)
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(MockMvcResultMatchers.status().isBadRequest)
+			.andExpect(jsonPath("$.name").exists())
+			.andExpect(jsonPath("$.price").exists())
+	}
+
+	@Test
 	fun saveTestWhenException(){
 		var productsFromService:List<Product> = productService.findAll()
 		assert(!productsFromService.isEmpty()){ "It shouldn't be empty" }
@@ -117,7 +145,7 @@ class ProductApplicationTests {
 
 	@Test
 	fun updateTestWhenProductNotExists(){
-		var product = Product(name = UUID.randomUUID().toString(),12.0)
+		var product = Product(name = "something wrong",12.0)
 		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.put(endPoint)
 			.body(data = product, mapper = objectMapper))
 			.andExpect(MockMvcResultMatchers.status().isNotFound)
