@@ -1,11 +1,14 @@
 package com.KotlinProject.product.Controller
 
 import com.KotlinProject.product.Interface.BasicCrud
+import io.swagger.annotations.ApiOperation
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 abstract class BasicController<T, ID> (private val basicCrud: BasicCrud<T, ID> ){
+
+    @ApiOperation("Get all entities")
     @GetMapping("/")
     fun findAll() = basicCrud.findAll()
 
