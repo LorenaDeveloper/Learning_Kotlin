@@ -6,6 +6,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 	kotlin("jvm") version "1.6.10"
 	kotlin("plugin.spring") version "1.6.10"
+	id ("org.jetbrains.kotlin.plugin.jpa") version "1.6.10"
 }
 
 group = "com.KotlinProject"
@@ -30,6 +31,13 @@ dependencies {
 	implementation("javax.validation:validation-api:2.0.1.Final")
 	implementation("org.springframework.boot:spring-boot-starter-validation:2.6.2")
 
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.6.2")
+
+	implementation("org.springframework.boot:spring-boot-starter-jdbc")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	runtimeOnly("com.h2database:h2")
+	compile("org.springframework.boot:spring-boot-starter-data-jpa:1.3.5.RELEASE")
 }
 
 tasks.withType<KotlinCompile> {

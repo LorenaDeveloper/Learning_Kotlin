@@ -1,33 +1,32 @@
 package com.KotlinProject.product.Service
 
+import com.KotlinProject.product.Dto.ProductDTO
 import com.KotlinProject.product.Interface.BasicCrud
 import com.KotlinProject.product.Model.Product
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class ProductService:BasicCrud<Product, String> {       // implements interface BasicCrud
-    //to create mutable set
-    private val products:MutableSet<Product> =  mutableSetOf(Product("Apple", 22.2), Product(price = 33.3, name = "Banana"))
+class ProductService(private val productDTO: ProductDTO):BasicCrud<Product, String> {       // implements interface BasicCrud
 
     //function than returns set of products as list
-    override fun findAll():List<Product> = products.toList();
+    override fun findAll():List<Product> = this.productDTO.findAll();
 
     override fun findById(id: String): Product? {
-        return this.products.find { it.name == id } //lambda function. find the product whose name equals string 'id'.
-                                                    // uses 'it' as iterator; another way -> { product -> product.name == id }
+        return this.productDTO.findByIdOrNull(id)
     }
 
     override fun save(t: Product): Boolean {
-        val found = findAll().filter { product -> product.name == t.name }
-        if (found.isNotEmpty()) return false
-        return this.products.add(t)
+//        val found = findAll().filter { product -> product.name == t.name }
+//        if (found.isNotEmpty()) return false
+        this.productDTO.save(t).let { return true }
     }
 
     override fun update(t: Product): Boolean {
-        return this.deleteById(t.name) && this.products.add(t)
+        this.productDTO.save(t).let { return true }
     }
 
     override fun deleteById(id: String): Boolean {
-        return this.products.remove(this.findById(id))
+        this.productDTO.deleteById(id).let { return true }
     }
 }
