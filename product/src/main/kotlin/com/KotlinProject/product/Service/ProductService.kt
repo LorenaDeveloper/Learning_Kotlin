@@ -1,32 +1,33 @@
 package com.KotlinProject.product.Service
 
-import com.KotlinProject.product.Dto.ProductDTO
+import com.KotlinProject.product.Dao.ProductDAO
 import com.KotlinProject.product.Interface.BasicCrud
 import com.KotlinProject.product.Model.Product
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import javax.persistence.EntityNotFoundException
 
 @Service
-class ProductService(private val productDTO: ProductDTO):BasicCrud<Product, String> {       // implements interface BasicCrud
+class ProductService(private val productDAO: ProductDAO):BasicCrud<Product, String> {       // implements interface BasicCrud
 
     //function than returns set of products as list
-    override fun findAll():List<Product> = this.productDTO.findAll();
+    override fun findAll():List<Product> = this.productDAO.findAll();
 
     override fun findById(id: String): Product? {
-        return this.productDTO.findByIdOrNull(id)
+        return this.productDAO.findByIdOrNull(id)
     }
 
-    override fun save(t: Product): Boolean {
-//        val found = findAll().filter { product -> product.name == t.name }
-//        if (found.isNotEmpty()) return false
-        this.productDTO.save(t).let { return true }
+    override fun save(t: Product): Product {
+        return if(!this.productDAO.existsById(t.name)) this.productDAO.save(t) else throw org.springframework.dao.DuplicateKeyException("${t.name} already exists")
     }
 
-    override fun update(t: Product): Boolean {
-        this.productDTO.save(t).let { return true }
+    override fun update(t: Product): Product {
+        return if(this.productDAO.existsById(t.name)) this.productDAO.save(t) else throw EntityNotFoundException("${t.name} doesn't exists")
     }
 
-    override fun deleteById(id: String): Boolean {
-        this.productDTO.deleteById(id).let { return true }
+    override fun deleteById(id: String): Product {
+        return this.findById(id)?.apply {
+            this@ProductService.productDAO.deleteById(id)
+        } ?: throw EntityNotFoundException("$id doesn't exists")
     }
 }

@@ -20,20 +20,11 @@ abstract class BasicController<T, ID> (private val basicCrud: BasicCrud<T, ID> )
     }
 
     @PostMapping
-    fun addProduct(@Valid @RequestBody body: T): ResponseEntity<Boolean> {
-        val entity = basicCrud.save(body)
-        return ResponseEntity.status(if (entity) HttpStatus.CREATED else HttpStatus.CONFLICT).body(entity)
-    }
+    fun addProduct(@Valid @RequestBody body: T) = this.basicCrud.save(body)
 
     @PutMapping
-    fun updateProduct(@Valid @RequestBody body: T): ResponseEntity<Boolean> {
-        val entity = basicCrud.update(body)
-        return ResponseEntity.status(if (entity) HttpStatus.OK else HttpStatus.NOT_FOUND).body(entity)
-    }
+    fun updateProduct(@Valid @RequestBody body: T) = this.basicCrud.update(body)
 
     @DeleteMapping("/{id}")
-    fun deleteById(@PathVariable id:ID): ResponseEntity<Boolean> {
-        val entity = basicCrud.deleteById(id)
-        return ResponseEntity.status(if (entity) HttpStatus.OK else HttpStatus.NOT_FOUND).body(entity)
-    }
+    fun deleteById(@PathVariable id:ID) = this.basicCrud.deleteById(id)
 }
