@@ -20,7 +20,7 @@ abstract class BasicController<T, ID> (private val basicCrud: BasicCrud<T, ID> )
     }
 
     @PostMapping
-    fun addProduct(@Valid @RequestBody body: T) = this.basicCrud.save(body)
+    fun addProduct(@Valid @RequestBody body: T) = ResponseEntity.status(HttpStatus.CREATED).body(this.basicCrud.save(body))
 
     @PutMapping
     fun updateProduct(@Valid @RequestBody body: T) = this.basicCrud.update(body)
