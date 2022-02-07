@@ -16,7 +16,7 @@ data class Product(
     var price:Double? = 1.5,
     @get:Min(0)
     var stock:Int = 0,
-    @ManyToOne(cascade = [CascadeType.ALL]) //one product has one supplier, but one supplier has many products //imp cascade
+    @ManyToOne(cascade = [CascadeType.PERSIST]) //one product has one supplier, but one supplier has many products //imp cascade
     val provider:Provider){
         override fun equals(other: Any?): Boolean {
             //first verify object not null

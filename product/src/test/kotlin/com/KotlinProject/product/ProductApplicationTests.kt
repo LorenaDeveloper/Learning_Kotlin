@@ -1,8 +1,8 @@
 package com.KotlinProject.product
 
 import com.KotlinProject.product.Model.Product
-import com.KotlinProject.product.Model.Provider
 import com.KotlinProject.product.Service.ProductService
+import com.KotlinProject.product.Service.ProviderService
 import com.KotlinProject.product.Utils.body
 import com.KotlinProject.product.Utils.bodyTo
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -41,10 +41,16 @@ class ProductApplicationTests {
 	private lateinit var objectMapper: ObjectMapper
 	@Autowired
 	private lateinit var productService: ProductService
+	@Autowired
+	private lateinit var providerService: ProviderService
+
+	private val defaultProvider by lazy{
+		providerService.findAll().first()
+	}
 
 	@Test
 	fun findAllTest() {
-		var productsFromService:List<Product> = productService.findAll()
+		val productsFromService:List<Product> = productService.findAll()
 		val products:List<Product> = mockMvc.perform(MockMvcRequestBuilders.get("$endPoint/"))
 			.andExpect(MockMvcResultMatchers.status().isOk)
 			.bodyTo(objectMapper)
@@ -56,8 +62,8 @@ class ProductApplicationTests {
 
 	@Test
 	fun findByIdTest(){
-		var productsFromService:List<Product> = productService.findAll()
-		assert(!productsFromService.isEmpty()){ "It shouldn't be empty" }
+		val productsFromService:List<Product> = productService.findAll()
+		assert(productsFromService.isNotEmpty()){ "It shouldn't be empty" }
 		val product = productsFromService.first()
 
 		mockMvc.perform(MockMvcRequestBuilders.get("$endPoint/${product.name}"))
@@ -67,8 +73,8 @@ class ProductApplicationTests {
 
 	@Test
 	fun findByIdTestWhenNotFound(){
-		var productsFromService:List<Product> = productService.findAll()
-		assert(!productsFromService.isEmpty()){ "It shouldn't be empty" }
+		val productsFromService:List<Product> = productService.findAll()
+		assert(productsFromService.isNotEmpty()){ "It shouldn't be empty" }
 		val product = productsFromService.first()
 
 		//${UUID.randomUUID()} generate random id
@@ -79,8 +85,7 @@ class ProductApplicationTests {
 
 	@Test
 	fun saveTest(){
-		val defaultProvider = Provider(name="Company name", email = "company_email@gmail.com")
-		val product = Product("pear", 1.55, 100, defaultProvider )
+		val product = Product("something new", 1.55, 100, defaultProvider )
 		val productFromApi:Product = mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
 			.content(objectMapper.writeValueAsBytes(product))
 			.contentType(MediaType.APPLICATION_JSON))
@@ -93,7 +98,7 @@ class ProductApplicationTests {
 	@Test
 	fun saveTestWhenCheckRulesName(){
 		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
-			.body(data = Product("", 1.0, provider = Provider(name="Company name", email = "company_email@gmail.com")), mapper = objectMapper)
+			.body(data = Product("", 1.0, provider = defaultProvider), mapper = objectMapper)
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().isBadRequest)
 			.andExpect(jsonPath("$.name").exists())
@@ -102,7 +107,7 @@ class ProductApplicationTests {
 	@Test
 	fun saveTestWhenCheckRulesPrice(){
 		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
-			.body(data = Product("pear", -1.0, provider = Provider(name="Company name", email = "company_email@gmail.com")), mapper = objectMapper)
+			.body(data = Product("pear", -1.0, provider = defaultProvider), mapper = objectMapper)
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().isBadRequest)
 			.andExpect(jsonPath("$.price").exists())
@@ -111,7 +116,7 @@ class ProductApplicationTests {
 	@Test
 	fun saveTestWhenCheckRules(){
 		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
-			.body(data = Product("", -1.0, provider = Provider(name="Company name", email = "company_email@gmail.com")), mapper = objectMapper)
+			.body(data = Product("", -1.0, provider = defaultProvider), mapper = objectMapper)
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().isBadRequest)
 			.andExpect(jsonPath("$.name").exists())
@@ -132,6 +137,21 @@ class ProductApplicationTests {
 	}
 
 	@Test
+	fun saveTestWhenProviderNotFound(){
+		val productsFromService:List<Product> = productService.findAll()
+		assert(!productsFromService.isEmpty()){ "It shouldn't be empty" }
+		val product = productsFromService.first().copy(name = "entity test").apply {
+			this.provider.id = 44
+		}
+
+		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
+			//another way to perform it
+			.body(data = product, mapper = objectMapper))
+			.andExpect(MockMvcResultMatchers.status().isConflict)
+			.andExpect(jsonPath("$.title", Matchers.`is`("JpaObjectRetrievalFailureException")))
+	}
+
+	@Test
 	fun updateTest(){
 		val productsFromService:List<Product> = productService.findAll()
 		assert(!productsFromService.isEmpty()){ "It shouldn't be empty" }
@@ -147,7 +167,7 @@ class ProductApplicationTests {
 
 	@Test
 	fun updateTestWhenProductDoesNotExists(){
-		val product = Product(name = "something wrong",12.0, 2, Provider(name="Company name", email = "company_email@gmail.com"))
+		val product = Product(name = "something wrong",12.0, 2, defaultProvider)
 		mockMvc.perform(MockMvcRequestBuilders.put(endPoint)
 			.body(data = product, mapper = objectMapper))
 			.andExpect(MockMvcResultMatchers.status().isConflict)
@@ -156,8 +176,8 @@ class ProductApplicationTests {
 
 	@Test
 	fun deleteById(){
-		var productsFromService:List<Product> = productService.findAll()
-		assert(!productsFromService.isEmpty()){ "It shouldn't be empty" }
+		val productsFromService:List<Product> = productService.findAll()
+		assert(productsFromService.isNotEmpty()){ "It shouldn't be empty" }
 		val product = productsFromService.last()
 
 		val productFromApi:Product = mockMvc.perform(MockMvcRequestBuilders.delete("$endPoint/${product.name}"))
