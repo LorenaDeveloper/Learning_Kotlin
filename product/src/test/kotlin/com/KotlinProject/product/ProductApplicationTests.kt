@@ -6,6 +6,8 @@ import com.KotlinProject.product.Utils.body
 import com.KotlinProject.product.Utils.bodyTo
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.assertj.core.api.Assertions.assertThat
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -76,14 +78,14 @@ class ProductApplicationTests {
 
 	@Test
 	fun saveTest(){
-		val product = Product("pear", 1.55)
-		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
+		val product = Product("pear", 1.55, stock = 5)
+		val productFromApi:Product = mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
 			.content(objectMapper.writeValueAsBytes(product))
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().isCreated)
 			.bodyTo(objectMapper)
 
-		assert(result)
+		assertThat(productService.findAll().contains(productFromApi))
 	}
 
 	@Test
@@ -115,43 +117,39 @@ class ProductApplicationTests {
 	}
 
 	@Test
-	fun saveTestWhenException(){
-		var productsFromService:List<Product> = productService.findAll()
+	fun saveTestWhenDuplicateEntity(){
+		val productsFromService:List<Product> = productService.findAll()
 		assert(!productsFromService.isEmpty()){ "It shouldn't be empty" }
 		val product = productsFromService.first()
 
-		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
+		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
 				//another way to perform it
 			.body(data = product, mapper = objectMapper))
 			.andExpect(MockMvcResultMatchers.status().isConflict)
-			.bodyTo(objectMapper)
-
-		assert(!result)
+			.andExpect(jsonPath("$.title", Matchers.`is`("DuplicateKeyException")))
 	}
 
 	@Test
 	fun updateTest(){
-		var productsFromService:List<Product> = productService.findAll()
+		val productsFromService:List<Product> = productService.findAll()
 		assert(!productsFromService.isEmpty()){ "It shouldn't be empty" }
 		val product = productsFromService.first().copy(price = 21.45) //copy object's state but allows changing attributes
 
-		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.put(endPoint)
+		val productFromApi:Product = mockMvc.perform(MockMvcRequestBuilders.put(endPoint)
 			.body(data = product, mapper = objectMapper))
 			.andExpect(MockMvcResultMatchers.status().isOk)
 			.bodyTo(objectMapper)
 
-		assert(result)
+		assertThat(product.name, Matchers.`is`(productFromApi.name))
 	}
 
 	@Test
-	fun updateTestWhenProductNotExists(){
-		var product = Product(name = "something wrong",12.0)
-		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.put(endPoint)
+	fun updateTestWhenProductDoesNotExists(){
+		val product = Product(name = "something wrong",12.0)
+		mockMvc.perform(MockMvcRequestBuilders.put(endPoint)
 			.body(data = product, mapper = objectMapper))
-			.andExpect(MockMvcResultMatchers.status().isNotFound)
-			.bodyTo(objectMapper)
-
-		assert(!result){"It should be false"}
+			.andExpect(MockMvcResultMatchers.status().isConflict)
+			.andExpect(jsonPath("$.title", Matchers.`is`("EntityNotFoundException")))
 	}
 
 	@Test
@@ -160,20 +158,17 @@ class ProductApplicationTests {
 		assert(!productsFromService.isEmpty()){ "It shouldn't be empty" }
 		val product = productsFromService.last()
 
-		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.delete("$endPoint/${product.name}"))
+		val productFromApi:Product = mockMvc.perform(MockMvcRequestBuilders.delete("$endPoint/${product.name}"))
 			.andExpect(MockMvcResultMatchers.status().isOk)
 			.bodyTo(objectMapper)
 
-		assert(result)
-		assertThat(!productService.findAll().contains(product))
+		assertThat(!productService.findAll().contains(productFromApi))
 	}
 
 	@Test
-	fun deleteByIdWhenPorductNotFound(){
-		val result:Boolean = mockMvc.perform(MockMvcRequestBuilders.delete("$endPoint/${UUID.randomUUID()}"))
-			.andExpect(MockMvcResultMatchers.status().isNotFound)
-			.bodyTo(objectMapper)
-
-		assert(!result){"Should be false"}
+	fun deleteByIdWhenProductNotFound(){
+		mockMvc.perform(MockMvcRequestBuilders.delete("$endPoint/${UUID.randomUUID()}"))
+			.andExpect(MockMvcResultMatchers.status().isConflict)
+			.andExpect(jsonPath("$.title", Matchers.`is`("EntityNotFoundException")))
 	}
 }

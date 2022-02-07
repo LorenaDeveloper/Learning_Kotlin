@@ -1,33 +1,33 @@
 package com.KotlinProject.product.Service
 
+import com.KotlinProject.product.Dao.ProductDAO
 import com.KotlinProject.product.Interface.BasicCrud
 import com.KotlinProject.product.Model.Product
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import javax.persistence.EntityNotFoundException
 
 @Service
-class ProductService:BasicCrud<Product, String> {       // implements interface BasicCrud
-    //to create mutable set
-    private val products:MutableSet<Product> =  mutableSetOf(Product("Apple", 22.2), Product(price = 33.3, name = "Banana"))
+class ProductService(private val productDAO: ProductDAO):BasicCrud<Product, String> {       // implements interface BasicCrud
 
     //function than returns set of products as list
-    override fun findAll():List<Product> = products.toList();
+    override fun findAll():List<Product> = this.productDAO.findAll();
 
     override fun findById(id: String): Product? {
-        return this.products.find { it.name == id } //lambda function. find the product whose name equals string 'id'.
-                                                    // uses 'it' as iterator; another way -> { product -> product.name == id }
+        return this.productDAO.findByIdOrNull(id)
     }
 
-    override fun save(t: Product): Boolean {
-        val found = findAll().filter { product -> product.name == t.name }
-        if (found.isNotEmpty()) return false
-        return this.products.add(t)
+    override fun save(t: Product): Product {
+        return if(!this.productDAO.existsById(t.name)) this.productDAO.save(t) else throw org.springframework.dao.DuplicateKeyException("${t.name} already exists")
     }
 
-    override fun update(t: Product): Boolean {
-        return this.deleteById(t.name) && this.products.add(t)
+    override fun update(t: Product): Product {
+        return if(this.productDAO.existsById(t.name)) this.productDAO.save(t) else throw EntityNotFoundException("${t.name} doesn't exists")
     }
 
-    override fun deleteById(id: String): Boolean {
-        return this.products.remove(this.findById(id))
+    override fun deleteById(id: String): Product {
+        return this.findById(id)?.apply {
+            this@ProductService.productDAO.deleteById(id)
+        } ?: throw EntityNotFoundException("$id doesn't exists")
     }
 }
