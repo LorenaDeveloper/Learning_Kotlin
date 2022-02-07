@@ -1,6 +1,7 @@
 package com.KotlinProject.product
 
 import com.KotlinProject.product.Model.Product
+import com.KotlinProject.product.Model.Provider
 import com.KotlinProject.product.Service.ProductService
 import com.KotlinProject.product.Utils.body
 import com.KotlinProject.product.Utils.bodyTo
@@ -78,7 +79,8 @@ class ProductApplicationTests {
 
 	@Test
 	fun saveTest(){
-		val product = Product("pear", 1.55, stock = 5)
+		val defaultProvider = Provider(name="Company name", email = "company_email@gmail.com")
+		val product = Product("pear", 1.55, 100, defaultProvider )
 		val productFromApi:Product = mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
 			.content(objectMapper.writeValueAsBytes(product))
 			.contentType(MediaType.APPLICATION_JSON))
@@ -91,7 +93,7 @@ class ProductApplicationTests {
 	@Test
 	fun saveTestWhenCheckRulesName(){
 		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
-			.body(data = Product("", 1.0), mapper = objectMapper)
+			.body(data = Product("", 1.0, provider = Provider(name="Company name", email = "company_email@gmail.com")), mapper = objectMapper)
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().isBadRequest)
 			.andExpect(jsonPath("$.name").exists())
@@ -100,7 +102,7 @@ class ProductApplicationTests {
 	@Test
 	fun saveTestWhenCheckRulesPrice(){
 		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
-			.body(data = Product("pear", -1.0), mapper = objectMapper)
+			.body(data = Product("pear", -1.0, provider = Provider(name="Company name", email = "company_email@gmail.com")), mapper = objectMapper)
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().isBadRequest)
 			.andExpect(jsonPath("$.price").exists())
@@ -109,7 +111,7 @@ class ProductApplicationTests {
 	@Test
 	fun saveTestWhenCheckRules(){
 		mockMvc.perform(MockMvcRequestBuilders.post(endPoint)
-			.body(data = Product("", -1.0), mapper = objectMapper)
+			.body(data = Product("", -1.0, provider = Provider(name="Company name", email = "company_email@gmail.com")), mapper = objectMapper)
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().isBadRequest)
 			.andExpect(jsonPath("$.name").exists())
@@ -145,7 +147,7 @@ class ProductApplicationTests {
 
 	@Test
 	fun updateTestWhenProductDoesNotExists(){
-		val product = Product(name = "something wrong",12.0)
+		val product = Product(name = "something wrong",12.0, 2, Provider(name="Company name", email = "company_email@gmail.com"))
 		mockMvc.perform(MockMvcRequestBuilders.put(endPoint)
 			.body(data = product, mapper = objectMapper))
 			.andExpect(MockMvcResultMatchers.status().isConflict)

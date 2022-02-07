@@ -1,5 +1,6 @@
 package com.KotlinProject.product.Model
 
+import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.ManyToOne
@@ -15,7 +16,7 @@ data class Product(
     var price:Double? = 1.5,
     @get:Min(0)
     var stock:Int = 0,
-    @ManyToOne //one product has one supplier, but one supplier has many products
+    @ManyToOne(cascade = [CascadeType.ALL]) //one product has one supplier, but one supplier has many products //imp cascade
     val provider:Provider){
         override fun equals(other: Any?): Boolean {
             //first verify object not null

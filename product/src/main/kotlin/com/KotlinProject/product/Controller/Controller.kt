@@ -1,7 +1,9 @@
 package com.KotlinProject.product.Controller
 
 import com.KotlinProject.product.Model.Product
+import com.KotlinProject.product.Model.Provider
 import com.KotlinProject.product.Service.ProductService
+import com.KotlinProject.product.Service.ProviderService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -17,5 +19,7 @@ class ProductController(productService: ProductService):BasicController<Product,
     }
 }
 
-
+@RestController
+@RequestMapping("/api/v1/provider")
+class ProviderController(providerService: ProviderService):BasicController<Provider, Int>(providerService)
 
