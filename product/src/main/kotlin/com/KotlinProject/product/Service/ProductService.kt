@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 import javax.persistence.EntityNotFoundException
 
 @Service
-class ProductService(private val productDAO: ProductDAO):BasicCrud<Product, String> {       // implements interface BasicCrud
+class ProductService(val productDAO: ProductDAO):BasicCrud<Product, String> {       // implements interface BasicCrud
 
     //function than returns set of products as list
     override fun findAll():List<Product> = this.productDAO.findAll();
