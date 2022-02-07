@@ -12,11 +12,16 @@ import org.springframework.stereotype.Component
 class onBoot(private val productService: ProductService, private val providerService: ProviderService):ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
 
-        val defaultProvider = providerService.save(Provider(name="Company name", email = "company_email@gmail.com"))
+        val defaultProvider = Provider(id = 1, name = "Company name", email = "company_email@gmail.com")
 
-        listOf(Product("apple", 5.0, 10, defaultProvider), Product("orange", 3.0, 15, defaultProvider)).forEach {
-            println("Saving -> ${it.name}")
-            productService.save(it)
+        if(!providerService.providerDAO.existsById(defaultProvider.id)) { this.providerService.save(defaultProvider) }
+
+        listOf(Product("apple", 5.0, 10, defaultProvider),
+            Product("orange", 3.0, 15, defaultProvider)).forEach {
+                if(!productService.productDAO.existsById(it.name)) {
+                    println("Saving -> ${it.name}")
+                    productService.save(it)
+                }
+            }
         }
     }
-}

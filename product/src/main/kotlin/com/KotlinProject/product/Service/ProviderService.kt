@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 import javax.persistence.EntityNotFoundException
 
 @Service
-class ProviderService(private  val providerDAO: ProviderDAO):BasicCrud<Provider, Int> {
+class ProviderService(val providerDAO: ProviderDAO):BasicCrud<Provider, Int> {
     override fun findAll(): List<Provider> {
         return this.providerDAO.findAll()
     }
