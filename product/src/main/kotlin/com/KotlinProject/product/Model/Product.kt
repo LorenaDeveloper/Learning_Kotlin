@@ -2,6 +2,7 @@ package com.KotlinProject.product.Model
 
 import javax.persistence.Entity
 import javax.persistence.Id
+import javax.persistence.ManyToOne
 import javax.validation.constraints.Min
 import javax.validation.constraints.Size
 
@@ -13,23 +14,24 @@ data class Product(
     @get:Min(0)
     var price:Double? = 1.5,
     @get:Min(0)
-    var stock:Int = 0
-    ){
-    override fun equals(other: Any?): Boolean {
-        //first verify object not null
-        other ?: return false //returns false if null
-        if (other === this) return true
-        if (this.javaClass != other.javaClass) return false
+    var stock:Int = 0,
+    @ManyToOne //one product has one supplier, but one supplier has many products
+    val provider:Provider){
+        override fun equals(other: Any?): Boolean {
+            //first verify object not null
+            other ?: return false //returns false if null
+            if (other === this) return true
+            if (this.javaClass != other.javaClass) return false
 
-        // now we're sure we've got 2 objects of the same class
-        // cast other to Product type
-        other as Product
+            // now we're sure we've got 2 objects of the same class
+            // cast other to Product type
+            other as Product
 
-        // return true/false just by name comparison
-        return this.name === other.name
+            // return true/false just by name comparison
+            return this.name === other.name
+        }
+
+        override fun hashCode(): Int {
+            return name.hashCode()
+        }
     }
-
-    override fun hashCode(): Int {
-        return name.hashCode()
-    }
-}
