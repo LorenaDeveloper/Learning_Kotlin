@@ -26,4 +26,4 @@ https://github.com/LorenaDeveloper/Learning_Kotlin.git
 ```
 
 # Status :chart_with_upwards_trend:
-Proyect is : _Work in progress_ :hammer_and_wrench:
+Proyect is : _Completed_
