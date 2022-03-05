@@ -7,6 +7,7 @@ I'm using this project to reinforce the knowledge I am acquiring in the course [
 * [Table of contents](#table-of-contents-nerd_face)
 * [General info](#general-info-thought_balloon)
 * [Tecnologies](#technologies-woman_technologist)
+* [Setup](#setup-mega)
 * [Status](#status-chart_with_upwards_trend)
 
 # General info 	:thought_balloon:
